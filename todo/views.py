@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views import generic
 
@@ -7,7 +7,7 @@ from todo.models import Task, Tag
 
 class IndexView(generic.ListView):
     model = Task
-    paginate_by = 7
+    paginate_by = 5
     template_name = "todo/index.html"
 
 
@@ -49,6 +49,17 @@ class TagUpdateView(generic.UpdateView):
 class TagDeleteView(generic.DeleteView):
     model = Tag
     success_url = reverse_lazy("todo:tag-list")
+
+
+def toggle_assign(request, pk):
+    task = Task.objects.get(id=pk)
+    if task.in_process is True:
+        task.in_process = False
+        task.save()
+    else:
+        task.in_process = True
+        task.save()
+    return HttpResponseRedirect(reverse_lazy("todo:index"))
 
 
 
